@@ -1,0 +1,40 @@
+h1 {
+    font-family:arial, sans-serif;
+    font-size: 25pt;
+    text-align: center; 
+    margin: 30px;
+}
+div {
+    align-self: center;
+    border: 3px solid black; 
+    width: 350px;
+    text-align: left;
+    padding: 0px 10px 10px 20px;
+    margin: 30px 50%;
+    transform: translate(-50%);
+}
+.ref_botton {
+    text-decoration: underline;
+}
+.botton1{
+    background-color: rgb(134, 221, 100);
+    border:rgb(134, 221, 100);
+    width: 80px;
+    height: 30px;
+    text-align: bottom;
+    padding-top: 5px;
+    border-radius: 5px;
+    font-size: 10pt;
+}
+.botton2{
+    background-color: red;
+    border:red;
+    width: 80px;
+    height: 30px;
+    color: white;
+    padding-top: 5px;
+    border-radius: 5px;
+    font-size: 10pt;
+}
+
+
