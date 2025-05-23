@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset = "utf-8">
+        <link rel = "stylesheet" type = "text/css" href = "main.css">
+        <link rel = "stylesheet" type = "text/css" media = "screen and (max-width: 1020px)" href = "main.css">
+    </head>
+    <body>
+        <header class = "flex-container">
+            <p><strong>인프밍 영화 정보 사이트입니다.</strong></p>
+        </header>
+        <nav class = "flex-container">
+            <span class = "mainpage-text">메인페이지</span> 
+            <a href = "login.html"> 로그인</a> 
+            <a href = "signup.html"> 회원가입</a>
+        </nav>
+        <hr>
+        <section class = "search_section">
+            <p>
+                <input type = "text" id = "searchBar" placeholder = "키워드를 입력하세요."></input>
+                <button id = "searchButton">Filter results</button>
+            </p>
+        </section>
+        <section>
+            <p id="movies"><strong>Movies</strong></p>
+            <hr>
+            <div class = "movies-box">
+                <aside>
+                    <form>
+                        <div class = "sorting_borad">
+                            <p><strong>정렬기준</strong></p>
+                            <input id= "vote_asc" value = "vote_asc" name = "sorted" type = "radio">평점 오름차순</br></br>
+                            <input id = "vote_des" value = "vote_des" name = "sorted" type = "radio">평점 내림차순</br></br>
+                            <input id = "open_asc" value = "open_asc" name = "sorted" type = "radio">개봉 오름차순</br></br>
+                            <input id = "open_des" value = "open_des" name = "sorted" type = "radio">개봉 내림차순</br></br>
+                        </div>
+                    </form>
+                </aside>
+                <main>
+                
+                </main>
+            </div>
+        </section>
+        <script>
+            window.addEventListener("load",onLoad);
+
+            function onLoad() {
+                fetch("product.json")
+                .then( response => {
+                    if(!response.ok) {
+                        throw new Error(`HTTP error: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(json => initialize(json))
+                .catch(err => console.error(`Fetch Problem: ${err.message}`));
+            }
+
+            // console.log("hello");
+
+            function initialize(product) {
+                console.log("product:");
+                console.log(product);
+                let count = 0;
+                let start = count;
+                let end = start+6;
+
+
+                const vote_asc_sorted = document.querySelector('input[id= "vote_asc"]');
+                const vote_des_sorted = document.querySelector('input[id= "vote_des"]');
+                const open_asc_sorted = document.querySelector('input[id= "open_asc"]');
+                const open_des_sorted = document.querySelector('input[id= "open_des"]');
+                const searchTerm = document.querySelector("#searchBar");
+                const searchButton = document.querySelector("#searchButton");
+                const main = document.querySelector('main');
+
+                // let lastSorted = sorted ? sorted.value: null;
+                let lastSorted;
+                let lastSearch = "";
+
+                let sortedGroup;
+                let finalGroup = product;
+                let presentedGroup;
+                
+                console.log(finalGroup);
+
+                updateDisplay();
+
+                searchButton.addEventListener('click',selectProducts);
+                
+                let sorted;
+                vote_asc_sorted.addEventListener('click', selectSorted);
+                
+                vote_des_sorted.addEventListener('click', selectSorted);
+                
+                sorted = open_asc_sorted;
+                open_asc_sorted.addEventListener('click', selectSorted);
+
+                sorted = open_des_sorted;
+                open_des_sorted.addEventListener('click', selectSorted);
+                
+
+                //firstevent
+                window.onscroll = () => {
+                    if(window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                        add();
+                    }
+                }
+
+                // finalGroup = [];
+                // sortedGroup = [];
+
+                function add() {
+                    start = end;
+                    end = start + 6;
+                    if(start >= finalGroup.length) {
+                        return;
+                    } else {
+                        for(let i = start; i<((end>=finalGroup.length)?
+                        finalGroup.length:end);i++) {
+                            presentedGroup.push(finalGroup[i]);
+                            showProduct(finalGroup[i]);
+                        }
+                    }
+                }
+
+                function selectProducts(e) {
+                    e.preventDefault();
+
+                    sortedGroup = [];
+
+                    if (searchTerm.value.trim() === lastSearch) {
+                        return;
+                    } else {
+                        lastSearch = searchTerm.value.trim();
+                        
+                    }
+                    sortedGroup = product;
+                    if(searchTerm.value.trim()==='') {
+                        finalGroup = sortedGroup;
+                    } else {
+                        const lowerCaseSearchTerm = searchTerm.value.trim().toLowerCase();
+                        finalGroup = sortedGroup.filter(product => product.title.toLowerCase().includes(lowerCaseSearchTerm));
+                    }
+                    console.log(finalGroup);
+                    updateDisplay();
+                }
+
+                function selectSorted(e) {
+
+                    sorted = document.querySelector("input[name='sorted']:checked");
+
+                    let sortVal = sorted.value;
+            
+                    if(sortVal !== null) {
+                        if(sortVal === "vote_asc") {
+                            finalGroup = finalGroup.sort((a,b)=>a.vote_average - b.vote_average);
+                        } else if(sortVal === "vote_des") {
+                            finalGroup = finalGroup.sort((a,b)=>b.vote_average - a.vote_average);
+                        } else if(sortVal === "open_asc") {
+                            finalGroup = finalGroup.sort((a,b)=>(new Date(a.release_date) - new Date(b.release_date)));
+                        } else {
+                            finalGroup = finalGroup.sort((a,b)=>new Date(b.release_date) - new Date(a.release_date));
+                        }
+                        console.log("정렬 직후의 finalGroup:");
+                        console.log(finalGroup); 
+                        updateDisplay();
+                    }
+                }
+                
+
+                function updateDisplay() {
+                    start = 0;
+                    end = ((start+6>finalGroup.length)?(finalGroup.length):start+6);
+
+                    while(main.firstChild) {
+                        main.removeChild(main.firstChild);
+                    }
+
+                    if(finalGroup.length === 0) {
+                        const para = document.createElement('p');
+                        para.textContent = "No result found";
+                        main.appendChild(para);
+                    } else {
+                        presentedGroup = finalGroup.slice(start,end);
+                        for (let i = start;i<end;i++) {
+                            showProduct(presentedGroup[i]);
+                        }
+                    }
+                }
+
+                function showProduct(product) {
+                    const section = document.createElement('section');
+                    const division_box = document.createElement('div');
+                    const para = document.createElement('p');
+                    const image = document.createElement('img');
+
+                    section.setAttribute('class', "movie_layer");
+
+                    division_box.classList.add("story_layer", "disabled");
+                    division_box.textContent = `줄거리:\n${product.overview}`;
+                    division_box.addEventListener('mouseenter',imageAble);
+                    division_box.addEventListener('mouseleave',imageDisable);
+                    
+                    para.setAttribute('class','title_layer');
+                    para.innerHTML = `<strong>${product.title}</strong>\n📅${product.release_date}\n\u2B50${product.vote_average}`;
+
+                    image.src = product.image;
+                    image.alt = product.title;
+
+                    main.appendChild(section);
+                    section.appendChild(image);
+                    section.appendChild(division_box);
+                    section.appendChild(para);
+                }
+
+                function imageAble(e) {
+                    this.classList.remove("disabled");
+                }
+                function imageDisable(e) {
+                    this.classList.add("disabled");
+                }
+            }
+            
+        </script>
+    </body>
+</html>
