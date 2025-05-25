@@ -56,11 +56,7 @@
                 .catch(err => console.error(`Fetch Problem: ${err.message}`));
             }
 
-            // console.log("hello");
-
             function initialize(product) {
-                console.log("product:");
-                console.log(product);
                 let count = 0;
                 let start = count;
                 let end = start+6;
@@ -74,15 +70,12 @@
                 const searchButton = document.querySelector("#searchButton");
                 const main = document.querySelector('main');
 
-                // let lastSorted = sorted ? sorted.value: null;
                 let lastSorted;
                 let lastSearch = "";
 
                 let sortedGroup;
                 let finalGroup = product;
                 let presentedGroup;
-                
-                console.log(finalGroup);
 
                 updateDisplay();
 
@@ -106,9 +99,6 @@
                         add();
                     }
                 }
-
-                // finalGroup = [];
-                // sortedGroup = [];
 
                 function add() {
                     start = end;
@@ -142,7 +132,6 @@
                         const lowerCaseSearchTerm = searchTerm.value.trim().toLowerCase();
                         finalGroup = sortedGroup.filter(product => product.title.toLowerCase().includes(lowerCaseSearchTerm));
                     }
-                    console.log(finalGroup);
                     updateDisplay();
                 }
 
@@ -162,8 +151,6 @@
                         } else {
                             finalGroup = finalGroup.sort((a,b)=>new Date(b.release_date) - new Date(a.release_date));
                         }
-                        console.log("정렬 직후의 finalGroup:");
-                        console.log(finalGroup); 
                         updateDisplay();
                     }
                 }
